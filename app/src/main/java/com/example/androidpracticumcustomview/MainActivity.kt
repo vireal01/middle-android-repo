@@ -24,18 +24,26 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startXmlPracticum() {
-        val customContainer = CustomContainer(this)
+        val customContainer = CustomContainer(context = this, animationDuration = 2_000L)
         setContentView(customContainer)
 
         val firstView = TextView(this).apply {
-            // TODO
-            // ...
+            text = "first"
+            textSize = 24f
         }
 
         val secondView = TextView(this).apply {
-            // TODO
-            // ...
+            text = "second"
+            textSize = 24f
         }
+
+
+        val third = TextView(this).apply {
+            text = "third"
+            textSize = 24f
+        }
+
+        customContainer.addView(firstView)
 
         // Добавление второго элемента через некоторое время
         Handler(Looper.getMainLooper()).postDelayed({
