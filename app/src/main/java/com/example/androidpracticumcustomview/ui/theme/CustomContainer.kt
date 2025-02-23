@@ -1,8 +1,9 @@
 package com.example.androidpracticumcustomview.ui.theme
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -39,11 +40,6 @@ class CustomContainer @JvmOverloads constructor(
             val childTop = if (i == 0) 0 else parentHeight - childHeight
 
             child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight)
-
-            Log.d(
-                "measures",
-                "child.layout(left: $childLeft, top: $childTop, right: ${childLeft + childWidth}, bottom: ${childTop + childHeight}"
-            )
         }
     }
 
@@ -52,30 +48,33 @@ class CustomContainer @JvmOverloads constructor(
             throw IllegalStateException("CustomContainer не может содержать более двух дочерних элементов")
         }
 
-
         val finalParams = LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         ) // для размещения в элементов центре, тк ViewGroup.TEXT_ALIGNMENT_CENTER не дает нужного результата
 
-
-
         post {
             val startY = if (childCount == 1) height / 2f else -height / 2f
-
 
             child.alpha = 0f
             child.translationY = startY
 
             val endY = child.top.toFloat()
-            Log.d("measures", "addView: startY - $startY endY - $endY")
-            Log.d("measures", "addView: height - $height")
-            child.animate()
-                .alpha(1f)
-                .setDuration(animationDuration)
-                .translationY(endY)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .start()
+
+            val fadeIn = ObjectAnimator.ofFloat(child, View.ALPHA, 0f, 1f).apply {
+                duration = 2000L
+            }
+
+            val moveDown = ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, startY, endY).apply {
+                duration = animationDuration
+                interpolator = AccelerateDecelerateInterpolator()
+            }
+
+            AnimatorSet().apply {
+                playTogether(fadeIn, moveDown)
+                start()
+            }
+
         }.apply {
             super.addView(child, finalParams)
         }

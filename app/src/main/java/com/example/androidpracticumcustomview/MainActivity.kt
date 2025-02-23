@@ -1,11 +1,19 @@
 package com.example.androidpracticumcustomview
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import com.example.androidpracticumcustomview.ui.theme.CustomContainer
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.androidpracticumcustomview.ui.theme.AnimationCompose
+import com.example.androidpracticumcustomview.ui.theme.AnimationXml
+import com.example.androidpracticumcustomview.ui.theme.MainScreen
 
 /*
 Задание:
@@ -13,41 +21,29 @@ import com.example.androidpracticumcustomview.ui.theme.CustomContainer
 */
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        /*
-        Раскомментируйте нужный вариант
-         */
-        startXmlPracticum() // «традиционный» android (XML)
-//          setContent { // Jetpack Compose
-//             MainScreen()
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      AppNavHost()
     }
+  }
+}
 
-    private fun startXmlPracticum() {
-        val customContainer = CustomContainer(context = this, animationDuration = 2_000L)
-        setContentView(customContainer)
-
-        val firstView = TextView(this).apply {
-            text = "first"
-            textSize = 24f
-        }
-
-        val secondView = TextView(this).apply {
-            text = "second"
-            textSize = 24f
-        }
-
-
-        val third = TextView(this).apply {
-            text = "third"
-            textSize = 24f
-        }
-
-        customContainer.addView(firstView)
-
-        // Добавление второго элемента через некоторое время
-        Handler(Looper.getMainLooper()).postDelayed({
-            customContainer.addView(secondView)
-        }, 2000)
+@Composable
+fun AppNavHost() {
+  val navController = rememberNavController()
+  NavHost(
+    navController = navController,
+    startDestination = "mainScreen"
+  ) {
+    composable("mainScreen") {
+      MainScreen(
+        onGoToXml = { navController.context.startActivity(Intent(navController.context, AnimationXml::class.java)) },
+        onGoToCompose = { navController.navigate("animationCompose") }
+      )
     }
+    composable("animationCompose") {
+      AnimationCompose()
+    }
+  }
 }
